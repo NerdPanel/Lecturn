@@ -1,4 +1,1 @@
-pub fn install(mc_version: String) {
-
-}
-
+pub fn install(mc_version: String) {}

@@ -1,8 +1,8 @@
-use std::{env, fs};
 use std::borrow::ToOwned;
 use std::fs::File;
 use std::io::Cursor;
 use std::path::Path;
+use std::{env, fs};
 
 use bytes::Bytes;
 use serde::{Deserialize, Serialize};
@@ -39,7 +39,12 @@ impl Version {
     pub fn download_server(&mut self) {
         let data = get_version_data(self);
         let current_dir = env::current_dir().unwrap();
-        let path = current_dir.join("download").join(&self.id).to_string_lossy().to_string().replace(".", "_");
+        let path = current_dir
+            .join("download")
+            .join(&self.id)
+            .to_string_lossy()
+            .to_string()
+            .replace(".", "_");
         fs::create_dir_all(&path).unwrap();
 
         // Download Server Jar
@@ -81,7 +86,11 @@ impl Version {
         }
         // Download
         let current_dir = env::current_dir().unwrap();
-        let path = current_dir.join("download/libraries/").join(&library.downloads.artifact.path).to_string_lossy().to_string();
+        let path = current_dir
+            .join("download/libraries/")
+            .join(&library.downloads.artifact.path)
+            .to_string_lossy()
+            .to_string();
         let url = library.downloads.artifact.url;
         Self::get_file(&url, path).await;
     }
@@ -105,7 +114,7 @@ impl Version {
         let parent = as_path.parent().unwrap();
         fs::create_dir_all(parent).unwrap();
         let mut file = File::create(path).unwrap();
-        let mut content =  Cursor::new(bytes);
+        let mut content = Cursor::new(bytes);
         std::io::copy(&mut content, &mut file).unwrap();
     }
 }
@@ -167,12 +176,7 @@ struct Library {
 
 pub fn get_version(mc_version: String) -> Option<Version> {
     let parsed = get_minecraft_versions();
-    for version in parsed.versions {
-        if version.id == mc_version {
-            return Some(version);
-        }
-    }
-    None
+    parsed.versions.into_iter().find(|version| version.id == mc_version)
 }
 
 pub fn get_latest_versions() -> Latest {
@@ -187,7 +191,9 @@ async fn get_json(url: &String) -> String {
 
 pub fn get_minecraft_versions() -> MinecraftVersions {
     let rt = Runtime::new().unwrap();
-    let response = rt.block_on(get_json(&"https://piston-meta.mojang.com/mc/game/version_manifest_v2.json".to_owned()));
+    let response = rt.block_on(get_json(
+        &"https://piston-meta.mojang.com/mc/game/version_manifest_v2.json".to_owned(),
+    ));
     serde_json::from_str(&response).unwrap()
 }
 

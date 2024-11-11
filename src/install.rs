@@ -1,52 +1,56 @@
 use config::{Config, ConfigError, Environment};
 use serde::Deserialize;
 
-fn get_main_url(loader: Loader, loader_ver: Option<String>, installer_ver: Option<String>, minecraft_ver: String) -> String {
+fn get_main_url(
+    loader: Loader,
+    loader_ver: Option<String>,
+    installer_ver: Option<String>,
+    minecraft_ver: String,
+) -> String {
     match loader {
-        Loader::VANILLA => String::from("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"),
-        Loader::FABRIC => String::from(format!("https://meta.fabricmc.net/v2/versions/loader/{}/{}/{}/server/jar", minecraft_ver, loader_ver.unwrap(), installer_ver.unwrap())),
+        Loader::Vanilla(_) => {
+            String::from("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json")
+        }
+        Loader::Fabric(_) => String::from(format!(
+            "https://meta.fabricmc.net/v2/versions/loader/{}/{}/{}/server/jar",
+            minecraft_ver,
+            loader_ver.unwrap(),
+            installer_ver.unwrap()
+        )),
         _ => todo!(),
     }
 }
 
-pub struct vanilla;
-pub struct fabric;
-pub struct forge;
-pub struct neoforge;
+pub struct Vanilla;
+pub struct Fabric;
+pub struct Forge;
+pub struct Neoforge;
 
 pub enum Loader {
-    VANILLA (vanilla),
-    FABRIC (fabric),
-    FORGE (forge),
-    NEOFORGE (neoforge),
+    Vanilla(Vanilla),
+    Fabric(Fabric),
+    Forge(Forge),
+    Neoforge(Neoforge),
 }
 
 pub trait Distro {
     fn install();
 }
 
-impl Distro for vanilla {
-    fn install() {
-
-    }
+impl Distro for Vanilla {
+    fn install() {}
 }
 
-impl Distro for fabric {
-    fn install() {
-
-    }
+impl Distro for Fabric {
+    fn install() {}
 }
 
-impl Distro for forge {
-    fn install() {
-
-    }
+impl Distro for Forge {
+    fn install() {}
 }
 
-impl Distro for neoforge {
-    fn install() {
-
-    }
+impl Distro for Neoforge {
+    fn install() {}
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -63,9 +67,8 @@ impl InstallConfig {
         let config: InstallConfig = Config::builder()
             .add_source(source)
             .build()?
-            .try_into()?;
+            .try_deserialize()?;
 
         Ok(config)
     }
 }
-

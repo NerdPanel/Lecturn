@@ -1,8 +1,7 @@
 mod api;
-mod parser;
+mod download;
 mod install;
 mod loader;
-mod download;
+mod parser;
 
-pub fn main() {
-}
+pub fn main() {}

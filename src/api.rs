@@ -12,7 +12,7 @@ pub fn list_minecraft_versions_all(only_stable: bool) -> String {
             }
         }
         combined.push_str(format!("{}, ", version.id).as_str());
-    };
+    }
     combined
 }
 
